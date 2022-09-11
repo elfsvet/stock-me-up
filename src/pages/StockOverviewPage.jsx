@@ -4,9 +4,9 @@ import { AutoComplete } from '../components/AutoComplete';
 export const StockOverviewPage = () => {
   return (
     <div>
-      StockOverviewPage
-      <StockList />
+      StockOverviewPage Logo will be here
       <AutoComplete />
+      <StockList />
     </div>
   );
 };

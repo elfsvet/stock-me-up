@@ -1,58 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import finnHub from '../apis/finnHub';
 import { BsFillCaretDownFill, BsFillCaretUpFill } from 'react-icons/bs';
+import { WatchListContext } from '../context/watchListContext';
 
 export const StockList = () => {
-  const [watchList, setWatchList] = useState(['GOOGL', 'MSFT', 'AMZN']);
   const [stock, setStock] = useState([]);
+  const {watchList} = useContext(WatchListContext);
+  const navigate = useNavigate()
 
   useEffect(() => {
     let isMounted = true;
     const fetchData = async () => {
-      const responses = [];
       try {
-        // const response1 = await finnHub.get('/quote', {
-        //   params: {
-        //     symbol: 'GOOGL',
-        //   },
-        // })
-        // responses.push(response1);
-        // const response2 = await finnHub.get('/quote', {
-        //     params: {
-        //         symbol: 'MSFT',
-        //     },
-        // });
-        // responses.push(response2);
-        // const response3 = await finnHub.get('/quote', {
-        //     params: {
-        //         symbol: 'AMZN',
-        //     },
-        // });
-        // responses.push(response3);
         const displayTheWatchList = (watchList) => {
           return watchList.map((stock) => {
             return finnHub.get('/quote', {
               params: {
-                symbol: stock.toUpperCase(),
+                symbol: stock,
               },
             });
           });
         };
 
         const responses = await Promise.all(
-          // finnHub.get('/quote', {
-          //     params: {
-          //       symbol: 'GOOGL',
-          //     },
-          //   }), finnHub.get('/quote', {
-          //     params: {
-          //         symbol: 'MSFT',
-          //     },
-          // }), finnHub.get('/quote', {
-          //     params: {
-          //         symbol: 'AMZN',
-          //     },
-          // })
+  
           displayTheWatchList(watchList)
         );
 
@@ -73,7 +45,7 @@ export const StockList = () => {
     };
     fetchData();
     return () => (isMounted = false);
-  }, []);
+  }, [watchList]);
 
   const changeColor = (data) => {
     return data < 0 ? 'danger' : 'success';
@@ -82,6 +54,10 @@ export const StockList = () => {
   const renderIcon = (data) => {
     return data < 0 ? <BsFillCaretDownFill /> : <BsFillCaretUpFill />;
   };
+
+  const handleStockSelect = (symbol)=> {
+    navigate(`detail/${symbol}`)
+  }
 
   return (
     <div>
@@ -101,7 +77,7 @@ export const StockList = () => {
         <tbody>
           {stock.map((stockData) => {
             return (
-              <tr className='table-row' key={stockData.symbol}>
+              <tr style={{cursor: 'pointer'}} onClick={() => handleStockSelect(stockData.symbol)} className='table-row' key={stockData.symbol}>
                 <th scope='row'>{stockData.symbol}</th>
                 <td>{stockData.data.c}</td>
                 <td className={`text-${changeColor(stockData.data.d)}`}>
